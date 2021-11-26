@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/LittleYe233/PersonalCreation?style=flat-square)
 
-语言：[English](/) 简体中文
+语言：[English](https://github.com/LittleYe233/PersonalCreation) 简体中文
 
 ## 简介
 
