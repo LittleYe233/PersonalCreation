@@ -18,6 +18,15 @@
 
 在原视频顶部添加内嵌 ASS 中文字幕。字幕源为萌娘百科“小さなてのひら”词条。
 
+## 主要更改
+
+- 添加内嵌 ASS 中文字幕；
+- 删去尾部部分片段。
+
+## 下载地址
+
+[GitHub Releases](https://github.com/LittleYe233/PersonalCreation/releases/tag/dev_chiisana_tenohira_mad-creation-v1.0.0)
+
 ## 解决方案
 
 以 *nix 为例：
@@ -34,12 +43,9 @@ chmod +x build.sh download.sh clean.sh
 
 生成的作品位于 `dist` 文件夹中。
 
-## 主要更改
-
-- 添加内嵌 ASS 中文字幕；
-- 删去尾部部分片段。
-
 ## 实现过程
+
+使用 Aegisub 等软件制作 ASS 字幕，保存为 `in.ass` 。
 
 以 *nix 为例，“获取素材”后的步骤可以合并为：
 
@@ -108,7 +114,7 @@ ffmpeg -i 'out2.mp4' -filter_complex "subtitles='in.ass'" 'out.mp4'
 | 站点 | 链接 |
 | :-: | :-: |
 | 百度贴吧 |  |
-| Bilibili |  |
+| Bilibili | https://www.bilibili.com/video/BV1MP4y1V7rB/ |
 | 博客园 |  |
 | CSDN |  |
 | 简书 |  |
