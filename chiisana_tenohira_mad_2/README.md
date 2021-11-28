@@ -55,10 +55,10 @@ ffmpeg -i 'in.flv' -ss 0:0:0 -to 0:4:41 -vcodec h264 -b:v 968K -time_base 1/1000
 
 ### 前期准备
 
-- Aegisub 等字幕制作软件
-- FFmpeg （需要 libass 支持）
-- Python 3
-- you-get
+- [Aegisub](https://aegi.vmoe.info/) 等字幕制作软件
+- [FFmpeg](https://ffmpeg.org/) （需要 libass 支持）
+- [Python 3](https://python.org)
+- [you-get](https://you-get.org/)
 
 ### 制作字幕
 
@@ -80,9 +80,11 @@ you-get -i https://www.bilibili.com/video/av53288473/
 # format:        flv720
 # container:     flv
 # quality:       高清 720P
-# size:          38.0 MiB (39840995 bytes)64001f@1118k, 30fps, video only, 39.13MiB
-you-get --format=flv720 https://www.bilibili.com/video/av53288473/ -O in.flv
+# size:          38.0 MiB (39840995 bytes)
+you-get --format=flv720 https://www.bilibili.com/video/av53288473/ -O in
 ```
+
+**注意：** `you-get` 的 `-O` 参数后不带扩展名，且下载后包含 `*.cmt.xml` 弹幕文件，该文件名不会受 `-O` 影响。
 
 ### 截取视频
 
