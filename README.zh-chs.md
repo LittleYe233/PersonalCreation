@@ -1,6 +1,6 @@
 # OSP (Open Source Processing) Project
 
-![GitHub](https://img.shields.io/github/license/LittleYe233/PersonalCreation?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/LittleYe233/PersonalCreation?style=flat-square) ![Platform](https://img.shields.io/badge/platform-Windows%20|%20Linux%20|%20OS%20X-lightgrey?style=flat-square) ![GitHub search hit counter](https://img.shields.io/github/search/LittleYe233/PersonalCreation/main?style=flat-square&label=main%20hit%20counter&color=blueviolet) ![GitHub repo size](https://img.shields.io/github/repo-size/LittleYe233/PersonalCreation?style=flat-square&color=pink) ![GitHub all releases](https://img.shields.io/github/downloads/LittleYe233/PersonalCreation/total?style=flat-square) ![GitHub Sponsors](https://img.shields.io/github/sponsors/LittleYe233?style=flat-square) ![GitHub milestones](https://img.shields.io/github/milestones/all/LittleYe233/PersonalCreation?style=flat-square&color=red) ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/w/LittleYe233/PersonalCreation/main?color=darkgreen&label=main%20commit%20activity&style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/LittleYe233/PersonalCreation?style=flat-square) ![GitHub Release Date](https://img.shields.io/github/release-date/LittleYe233/PersonalCreation?style=flat-square)
 
 语言：[English](https://github.com/LittleYe233/PersonalCreation) 简体中文
 
@@ -50,3 +50,4 @@
 | 标识符 | 标题名 |
 | :-: | :-: |
 | [chiisana_tenoira_mad](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad) | [小さなてのひら MAD 中文字幕内嵌](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad/chiisana_tenohira_mad) |
+| [chiisana_tenoira_mad_2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2) | [小さなてのひら MAD 中文字幕内嵌 2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2/chiisana_tenohira_mad_2) |
