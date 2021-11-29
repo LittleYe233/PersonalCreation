@@ -26,7 +26,7 @@
 
 ## 下载地址
 
-[GitHub Releases](https://github.com/LittleYe233/PersonalCreation/releases/tag/dev_chiisana_tenohira_mad_2-creation-v1.0.0)
+[GitHub Releases](https://github.com/LittleYe233/PersonalCreation/releases/tag/dev_chiisana_tenohira_mad_2-creation-v1.1.0)
 
 ## 解决方案
 
