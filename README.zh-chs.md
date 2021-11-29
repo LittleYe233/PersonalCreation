@@ -50,4 +50,4 @@
 | 标识符 | 标题名 |
 | :-: | :-: |
 | [chiisana_tenoira_mad](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad) | [小さなてのひら MAD 中文字幕内嵌](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad/chiisana_tenohira_mad) |
-| [chiisana_tenoira_mad_2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2) | [小さなてのひら MAD 中文字幕内嵌 2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2/chiisana_tenohira_mad_2) |
+| [chiisana_tenoira_mad_2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2) | [小さなてのひら MAD 中、日、罗马音字幕内嵌](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2/chiisana_tenohira_mad_2) |
