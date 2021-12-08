@@ -4,7 +4,8 @@
 
 
 import pathlib
-from typing import Callable, Dict, Iterable, Union
+import time
+from typing import Any, Callable, Dict, Iterable, Tuple, Union
 
 import cv2
 import numpy as np
@@ -16,7 +17,7 @@ class VideoConductor:
     def __init__(
         self,
         outfile: Union[str, pathlib.Path],
-        size: Iterable[int],
+        size: Tuple[int, int],
         fps: int,
         fourcc: str,
         genfunc: Callable[[int], Union[np.ndarray, None]]
@@ -48,7 +49,7 @@ class VideoConductor:
     def conduct(
         self,
         nframes: int = -1,
-        callback: Union[Callable[[Dict]], None] = None
+        callback: Union[Callable[[Dict], Any], None] = None
     ):
         """Conduct the video.
         
@@ -64,18 +65,68 @@ class VideoConductor:
 
         if not isinstance(nframes, int):
             raise TypeError('nframes should be an integer')
+
+        if not isinstance(callback, Callable):
+            raise TypeError('callback should be callable')
         
         fourcc_code = cv2.VideoWriter_fourcc(*self.fourcc)
         writer = cv2.VideoWriter(self.outfile, fourcc_code, self.fps, self.size)
         cur_frame_pos = 0
-        while True:
-            if cur_frame_pos == nframes:
-                break
-            cur_frame = self.genfunc(cur_frame_pos)
-            if cur_frame is None:
-                break
-            writer.write(cur_frame)
+        try:
+            while True:
+                if cur_frame_pos == nframes:
+                    callback({
+                        'time': time.time(),
+                        'status': 'finish_generating_frames',
+                        'cause': 'reach_nframes_limit',
+                        'video_writer': writer,
+                        'current_frame_pos': cur_frame_pos
+                    })
+                    break
+                cur_frame = self.genfunc(cur_frame_pos)
+                if cur_frame is None:
+                    callback({
+                        'time': time.time(),
+                        'status': 'finish_generating_frames',
+                        'cause': 'generate_blank_frame',
+                        'video_writer': writer,
+                        'current_frame_pos': cur_frame_pos
+                    })
+                    break
+                callback({
+                    'time': time.time(),
+                    'status': 'before_write_frame',
+                    'video_writer': writer,
+                    'current_frame_pos': cur_frame_pos,
+                    'current_frame': cur_frame
+                })
+                writer.write(cur_frame)
+                callback({
+                    'time': time.time(),
+                    'status': 'after_write_frame',
+                    'video_writer': writer,
+                    'current_frame_pos': cur_frame_pos,
+                    'current_frame': cur_frame
+                })
+                cur_frame_pos += 1
+        except Exception as e:
+            callback({
+                'time': time.time(),
+                'status': 'error',
+                'video_writer': writer,
+                'current_frame_pos': cur_frame_pos,
+                'current_frame': cur_frame,
+                'err': e
+            })
+        
         writer.release()
+        callback({
+            'time': time.time(),
+            'status': 'finish',
+            'video_writer': writer,
+            'current_frame_pos': cur_frame_pos,
+            'current_frame': cur_frame
+        })
 
     @property
     def outfile(self): return self._outfile
@@ -100,7 +151,7 @@ class VideoConductor:
         self._outfile = val
 
     @size.setter
-    def size(self, val: Iterable[int, int]):
+    def size(self, val: Tuple[int, int]):
 
         if not isinstance(val, Iterable):
             raise TypeError('argument should be iterable')
