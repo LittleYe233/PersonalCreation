@@ -2,6 +2,9 @@
 # workspaces
 *.code-workspace
 
+# Local History extension
+.history/
+
 ## Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
