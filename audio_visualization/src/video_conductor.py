@@ -5,6 +5,7 @@
 
 import pathlib
 import time
+import subprocess
 from typing import Any, Callable, Dict, Iterable, Tuple, Union
 
 import cv2
@@ -74,7 +75,7 @@ class VideoConductor:
         cur_frame_pos = 0
         try:
             while True:
-                if cur_frame_pos == nframes:
+                if nframes >= 0 and cur_frame_pos >= nframes:
                     callback({
                         'time': time.time(),
                         'status': 'finish_generating_frames',
@@ -83,6 +84,8 @@ class VideoConductor:
                         'current_frame_pos': cur_frame_pos
                     })
                     break
+                # NOTE: The color channel order of this frame should be RGB. But
+                # in OpenCV is BGR. So we should flip the 3rd dimension below.
                 cur_frame = self.genfunc(cur_frame_pos)
                 if cur_frame is None:
                     callback({
@@ -100,7 +103,8 @@ class VideoConductor:
                     'current_frame_pos': cur_frame_pos,
                     'current_frame': cur_frame
                 })
-                writer.write(cur_frame)
+                # flip the color channels
+                writer.write(cur_frame[:, :, ::-1])
                 callback({
                     'time': time.time(),
                     'status': 'after_write_frame',

@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "src.test.test_generate_video",
+            "cwd": "${workspaceFolder}/audio_visualization"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

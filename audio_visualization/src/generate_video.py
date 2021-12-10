@@ -9,10 +9,11 @@ import time
 import wave
 from typing import Tuple, Union
 
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
-from video_conductor import VideoConductor
+from .video_conductor import VideoConductor
 
 
 def generate(
@@ -40,6 +41,7 @@ def generate(
     anchor_right = anchor_left + anchor_width - 1
     anchor_up = math.ceil(size[1] / 2 - 1)
     anchor_down = math.floor(size[1] / 2)
+    anchor_height = anchor_down - anchor_up + 1
     draw_bg.rectangle((anchor_left, anchor_up, anchor_right, anchor_down),
                       (255, 255, 255, 255))
 
@@ -55,7 +57,7 @@ def generate(
     wr.rewind()
 
     # Step 4: Define generation function
-    layer_wave_height = wave_max_height * 2 + anchor_down - anchor_up + 1
+    layer_wave_height = wave_max_height * 2 + anchor_height
     layer_wave = Image.new('RGBA', (anchor_width, layer_wave_height))
     draw_layer_wave = ImageDraw.Draw(layer_wave)
 
@@ -75,11 +77,15 @@ def generate(
     #     print(d)
 
     def callback(d: dict):
-        if 'current_frame' in d:
-            del d['current_frame']
-        d['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
-                                  time.localtime(d['time']))
-        print(d)
+        
+        if d['status'] not in ('after_write_frame', 'error'):
+            return
+        tup = time.localtime(d['time'])
+        if d['status'] != 'error' and d['current_frame_pos'] % 60 != 0:
+            return
+        print(time.strftime('%Y-%m-%d %H:%M:%S', tup), d['current_frame_pos'])
+        # cv2.imwrite('frames/%06d.png' % d['current_frame_pos'],
+        #             d['current_frame'])
 
     def genfunc(n: int) -> np.ndarray:
         frame = bg.copy()
@@ -87,17 +93,22 @@ def generate(
         # Step 4.1: Move wave
         layer_wave.paste(layer_wave, (-speed, 0))
 
+        # Step 4.2: Erase useless part of wave
+        draw_layer_wave.rectangle(
+            (anchor_width - speed, 0, anchor_width, layer_wave_height),
+            (0, 0, 0, 0))
+
         for i in range(speed):
-            # Step 4.2: Draw new part of wave
+            # Step 4.3: Draw new part of wave
             wr.setpos((n * speed + i) * math.floor(audio_frames_per_px))
             str_data = wr.readframes(1)
             w = np.frombuffer(str_data, dtype=np.int16)
             w = abs(w * 1.0 / max_abs_w)  # shape: (2,)
             draw_layer_wave.line((
-                anchor_right - speed + i,
-                anchor_up - math.floor(wave_max_height * w[0] + 0.5),
-                anchor_right - speed + i,
-                anchor_down + math.floor(wave_max_height * w[1] + 0.5)
+                anchor_width - speed + i,
+                math.floor(wave_max_height * (1 - w[0]) + 0.5),
+                anchor_width - speed + i,
+                anchor_height - 1 + int(wave_max_height * (1 + w[1]) + 0.5)
             ), (255, 255, 255, 255))
         
         # Step 4.3: Apply all layers
@@ -107,5 +118,6 @@ def generate(
         return np.array(frame.convert('RGB'))
 
     # Step 5: Launch video conductor
+    video_nframes = math.ceil(nframes / framerate * fps)
     vc = VideoConductor(outfile, size, fps, fourcc, genfunc)
-    vc.conduct(callback=callback)
+    vc.conduct(nframes=video_nframes, callback=callback)
