@@ -7,9 +7,9 @@ import math
 import pathlib
 import time
 import wave
+from io import IOBase
 from typing import Tuple, Union
 
-import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -20,11 +20,14 @@ def generate(
     outfile: Union[str, pathlib.Path],
     size: Tuple[int, int],
     fps: int,
-    fourcc: str,
+    vcodec: str,
+    bv: int,
     speed: int,
     audiofile: Union[str, pathlib.Path],
-    backgroundfile: Union[str, pathlib.Path]
-):
+    backgroundfile: Union[str, pathlib.Path],
+    stdout: Union[int, IOBase, None],
+    stderr: Union[int, IOBase, None]
+) -> Image.Image:
     """A function to generate the final creation.
     
     NOTE: We assume that all parameters are valid.
@@ -60,21 +63,6 @@ def generate(
     layer_wave_height = wave_max_height * 2 + anchor_height
     layer_wave = Image.new('RGBA', (anchor_width, layer_wave_height))
     draw_layer_wave = ImageDraw.Draw(layer_wave)
-
-    # def callback(d: dict):
-    #     if d['status'] != 'error':
-    #         if d['status'] != 'write_current_frame':
-    #             return
-    #         if d['current_frame_pos'] % 60 != 0:
-    #             return
-    #     d['time'] = time.strftime('%Y-%m-%d %H:%M:%S',
-    #                               time.localtime(d['time']))
-    #     del d['video_writer']
-    #     if 'current_frame' in d:
-    #         del d['current_frame']
-    #     if 'cur_frame' in d:
-    #         del d['cur_frame']
-    #     print(d)
 
     def callback(d: dict):
         
@@ -115,9 +103,9 @@ def generate(
         frame.paste(layer_wave, (anchor_left, anchor_up - wave_max_height),
                     layer_wave)
 
-        return np.array(frame.convert('RGB'))
+        return frame.convert('RGB')
 
     # Step 5: Launch video conductor
     video_nframes = math.ceil(nframes / framerate * fps)
-    vc = VideoConductor(outfile, size, fps, fourcc, genfunc)
-    vc.conduct(nframes=video_nframes, callback=callback)
+    vc = VideoConductor(outfile, size, fps, vcodec, bv, genfunc, audiofile)
+    vc.conduct(video_nframes, stdout, stderr, callback)
