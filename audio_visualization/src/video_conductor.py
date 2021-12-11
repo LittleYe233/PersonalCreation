@@ -21,10 +21,12 @@ class VideoConductor:
         outfile: Union[str, pathlib.Path],
         size: Tuple[int, int],
         fps: int,
-        vcodec: str,
-        bv: int,
         genfunc: Callable[[int], Union[np.ndarray, None]],
-        audiofile: Union[str, pathlib.Path, None] = None
+        vcodec: Union[str, None] = None,
+        bv: Union[int, None] = None,
+        audiofile: Union[str, pathlib.Path, None] = None,
+        acodec: Union[str, None] = None,
+        filter_complex: Union[str, None] = None
     ):
         """A video conductor object.
         
@@ -34,10 +36,6 @@ class VideoConductor:
 
         :param fps: frames per second
 
-        :param vcodec: FFmpeg video codec string (e.g. h264)
-
-        :param bv: FFmpeg video bitrate (unit: Kb/s)
-
         :param genfunc: generation function
         NOTE: ``genfunc`` should accept an integer ``n`` referring to the
         ``n``-th frame and return an HxWx3 array as the frame pixels or a
@@ -45,17 +43,32 @@ class VideoConductor:
         Image object if it is not an array), returning ``None`` only if
         reaching the end of generation.
 
-        :param audiofile: the audio file path (default: None)
-        NOTE: The default codec is AAC and can't be changed now.
+        :param vcodec: FFmpeg video codec string (e.g. h264). Use ``None``
+        to remove this option in FFmpeg args. (default: None)
+
+        :param bv: FFmpeg video bitrate (unit: Kb/s). Use ``None`` to remove
+        this option in FFmpeg args. (default: None)
+
+        :param audiofile: The audio file path. Use ``None`` to remove this
+        option in FFmpeg args. (default: None)
+
+        :param acodec: FFmpeg audio codec string (e.g. aac). Use ``None``
+        to remove this option in FFmpeg args. You can't set a specific codec
+        if ``.audiofile`` is None. (default: None)
+
+        :param filter_complex: FFmpeg filter_complex string. Use ``None``
+        to remove this option in FFmpeg args. (default: None)
         """
         
         self._outfile = outfile
         self._size = size
         self._fps = fps
+        self._genfunc = genfunc
         self._vcodec = vcodec
         self._bv = bv
-        self._genfunc = genfunc
         self._audiofile = audiofile
+        self._acodec = acodec
+        self._filter_complex = filter_complex
 
     def conduct(
         self,
@@ -98,20 +111,22 @@ class VideoConductor:
                             '"subprocess" module, an existing file object or '
                             'None')
         
-        if self.audiofile is None:
-            args = ['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'mjpeg',
-                    '-r', str(self.fps), '-i', '-',
-                    '-vcodec', self.vcodec, '-r', str(self.fps), '-vf',
-                    'scale=%d:%d' % self.size, '-b:v', '%dK' % self.bv,
-                    self.outfile]
-        else:
-            args = ['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'mjpeg',
-                    '-r', str(self.fps), '-i', '-',
-                    '-i', self.audiofile,
-                    '-vcodec', self.vcodec, '-r', str(self.fps), '-vf',
-                    'scale=%d:%d' % self.size, '-b:v', '%dK' % self.bv,
-                    '-acodec', 'aac',
-                    self.outfile]
+        # parse args
+        args = ['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', 'mjpeg',
+                '-r', str(self.fps), '-i', '-']
+        if self.audiofile is not None:
+            args.extend(['-i', self.audiofile])
+        if self.vcodec is not None:
+            args.extend(['-vcodec', self.vcodec])
+        args.extend(['-r', str(self.fps), '-vf', 'scale=%d:%d' % self.size])
+        if self.bv is not None:
+            args.extend(['-b:v', '%dK' % self.bv])
+        if self.acodec is not None:
+            args.extend(['-acodec', self.acodec])
+        if self.filter_complex is not None:
+            args.extend(['-filter_complex', self.filter_complex])
+        args.append(self.outfile)
+
         ffmpeg_proc = subprocess.Popen(args, stdin=subprocess.PIPE,
                                        stdout=stdout, stderr=stderr)
         cur_frame_pos = 0
@@ -157,7 +172,7 @@ class VideoConductor:
                 })
                 cur_frame_pos += 1
         except Exception as e:
-            ffmpeg_proc.stdin.close()
+            # ffmpeg_proc.stdin.close()
             callback({
                 'time': time.time(),
                 'status': 'error',
@@ -182,12 +197,6 @@ class VideoConductor:
 
     @property
     def size(self): return self._size
-
-    @property
-    def fps(self): return self._fps
-
-    @property
-    def bv(self): return self._bv
     
     @property
     def vcodec(self): return self._vcodec
@@ -196,7 +205,19 @@ class VideoConductor:
     def genfunc(self): return self._genfunc
 
     @property
+    def fps(self): return self._fps
+
+    @property
+    def bv(self): return self._bv
+
+    @property
     def audiofile(self): return self._audiofile
+
+    @property
+    def acodec(self): return self._acodec
+
+    @property
+    def filter_complex(self): return self._filter_complex
 
     @outfile.setter
     def outfile(self, val: Union[str, pathlib.Path]):
@@ -227,28 +248,28 @@ class VideoConductor:
             raise ValueError('argument should not be negative')
         self._fps = val
 
-    @vcodec.setter
-    def vcodec(self, val: str):
-
-        if not isinstance(val, str):
-            raise TypeError('argument should be str')
-        self._vcodec = val
-
-    @bv.setter
-    def bv(self, val: int):
-
-        if not isinstance(val, int):
-            raise TypeError('argument should be an integer')
-        if val <= 0:
-            raise ValueError('argument should not be negative')
-        self._bv = val
-
     @genfunc.setter
     def genfunc(self, val: Callable):
 
         if not isinstance(val, Callable):
             raise TypeError('argument should be callable')
         self._genfunc = val
+
+    @vcodec.setter
+    def vcodec(self, val: Union[str, None]):
+
+        if not isinstance(val, str) and val is not None:
+            raise TypeError('argument should be str or None')
+        self._vcodec = val
+
+    @bv.setter
+    def bv(self, val: Union[int, None]):
+
+        if not isinstance(val, int) and val is not None:
+            raise TypeError('argument should be an integer or None')
+        if val <= 0:
+            raise ValueError('argument should not be negative')
+        self._bv = val
 
     @audiofile.setter
     def audiofile(self, val: Union[str, pathlib.Path, None]):
@@ -257,3 +278,20 @@ class VideoConductor:
             raise TypeError('argument should be str, a path-like object or '
                             'None')
         self._audiofile = val
+
+    @acodec.setter
+    def acodec(self, val: Union[str, None]):
+
+        if val is not None and self.audiofile is None:
+            raise ValueError('audio file is not specified')
+
+        if not isinstance(val, str) and val is not None:
+            raise TypeError('argument should be str or None')
+        self._acodec = val
+
+    @filter_complex.setter
+    def filter_complex(self, val: Union[str, None]):
+
+        if not isinstance(val, str) and val is not None:
+            raise TypeError('argument should be str or None')
+        self._filter_complex = val
