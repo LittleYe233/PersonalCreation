@@ -76,12 +76,7 @@ def generate(
     wr.rewind()
 
     # Step 4: Define generation function
-    layer_wave_height = wave_max_height * 2 + anchor_height
-    layer_wave = Image.new('RGBA', (anchor_width, layer_wave_height))
-    draw_layer_wave = ImageDraw.Draw(layer_wave)
-
     def callback(d: dict):
-        
         if d['status'] not in ('after_write_frame', 'error'):
             return
         tup = time.localtime(d['time'])
@@ -109,7 +104,13 @@ def generate(
         
         return Image.blend(mask, frame, n / fps / 6).convert('RGB')
 
-    # Step 4.2: Wave
+    # Step 4.2: Plots
+    # NOTE: The "plots" can be many forms of visualization. In commit 46a06d6
+    # the step name is "Wave" which is one of the available forms.
+    layer_wave_height = wave_max_height * 2 + anchor_height
+    layer_wave = Image.new('RGBA', (anchor_width, layer_wave_height))
+    draw_layer_wave = ImageDraw.Draw(layer_wave)
+
     def genfunc_wave(n: int) -> Image.Image:
         frame = bg.copy()
 
@@ -194,7 +195,7 @@ def generate(
                             shadow_filter=ImageFilter.BoxBlur(7),
                             size_expand=(10, 10, 10, 10))(n - t1)
 
-    # Step 4.3.4: Construct with wave
+    # Step 4.3.4: Mix with plots
     for lang, lrcfile in lrcfiles.items():
         if lang not in AVAILABLE_LRC_LANGS:
             raise ValueError('invalid subtitle language: %s' % lang)
