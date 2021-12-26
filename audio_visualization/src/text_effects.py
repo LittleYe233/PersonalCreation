@@ -3,13 +3,13 @@
 """A module for text special effects."""
 
 
+import math
 from datetime import timedelta
 from functools import partial
 from typing import Any, Callable, Generator, List, Literal, Tuple, Union
 
-import srt
-import math
 import pylrc
+import srt
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
