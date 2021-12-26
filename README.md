@@ -51,3 +51,4 @@ Below are identifiers and titles (the first-level titles of `README.md` in creat
 | :-: | :-: |
 | [chiisana_tenoira_mad](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad) | [小さなてのひら MAD 中文字幕内嵌](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad/chiisana_tenohira_mad) |
 | [chiisana_tenoira_mad_2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2) | [小さなてのひら MAD 中文字幕内嵌 2](https://github.com/LittleYe233/PersonalCreation/tree/dev_chiisana_tenohira_mad_2/chiisana_tenohira_mad_2) |
+| [audio_visualization](https://github.com/LittleYe233/PersonalCreation/tree/dev_audio_visualization) | [音频简易可视化](https://github.com/LittleYe233/PersonalCreation/tree/dev_audio_visualization/audio_visualization) |
